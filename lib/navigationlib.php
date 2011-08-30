@@ -1602,9 +1602,6 @@ class global_navigation extends navigation_node {
                     } else {
                         $activity->url = $cm->get_url()->out();
                         $activity->display = true;
-                        if (self::module_extends_navigation($cm->modname)) {
-                            $activity->nodetype = navigation_node::NODETYPE_BRANCH;
-                        }
                     }
                     $activities[$cmid] = $activity;
                     $sections[$key]->hasactivites = true;
@@ -1731,8 +1728,6 @@ class global_navigation extends navigation_node {
         if (!$url) {
             // Don't show activities that don't have links!
             $activitynode->display = false;
-        } else if (self::module_extends_navigation($cm->modname)) {
-            $activitynode->nodetype = navigation_node::NODETYPE_BRANCH;
         }
         return $activitynode;
     }
