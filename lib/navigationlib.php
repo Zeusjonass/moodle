@@ -1567,7 +1567,7 @@ class global_navigation extends navigation_node {
      * @return array Array($sections, $activities)
      */
     protected function generate_sections_and_activities(stdClass $course) {
-        global $CFG;
+        global $CFG, $DB;
         require_once($CFG->dirroot.'/course/lib.php');
 
         if (!$this->cache->cached('course_sections_'.$course->id) || !$this->cache->cached('course_activites_'.$course->id)) {
@@ -1603,7 +1603,17 @@ class global_navigation extends navigation_node {
                         $activity->url = $cm->get_url()->out();
                         $activity->display = true;
                         if (self::module_extends_navigation($cm->modname)) {
-                            $activity->nodetype = navigation_node::NODETYPE_BRANCH;
+                            if(self::module_has_will_extend_navigation($cm->modname)) {
+                                $file = $CFG->dirroot.'/mod/'.$cm->modname.'/lib.php';
+                                $function = $cm->modname.'_will_extend_navigation';
+                                $activityrecord = $DB->get_record($cm->modname, array('id' => $cm->instance), '*', MUST_EXIST);
+                                // File and function exist as per module_has_will_extend_navigation, no need to check again
+                                require_once($file);
+                                $activity->nodetype = $function($activity, $course, $activityrecord, $cm) ? navigation_node::NODETYPE_BRANCH : navigation_node::NODETYPE_LEAF;
+                            } else {
+                                // Default to NODETYPE_BRANCH if no will_extend function exists
+                                $activity->nodetype = navigation_node::NODETYPE_BRANCH;
+                            }
                         }
                     }
                     $activities[$cmid] = $activity;
@@ -1726,6 +1736,7 @@ class global_navigation extends navigation_node {
      * @return navigation_node or null if not accessible
      */
     protected function load_stealth_activity(navigation_node $coursenode, $modinfo) {
+        global $DB;
         if (empty($modinfo->cms[$this->page->cm->id])) {
             return null;
         }
@@ -1746,7 +1757,17 @@ class global_navigation extends navigation_node {
             // Don't show activities that don't have links!
             $activitynode->display = false;
         } else if (self::module_extends_navigation($cm->modname)) {
-            $activitynode->nodetype = navigation_node::NODETYPE_BRANCH;
+            if(self::module_has_will_extend_navigation($cm->modname)) {
+                $file = $CFG->dirroot.'/mod/'.$cm->modname.'/lib.php';
+                $function = $cm->modname.'_will_extend_navigation';
+                $activityrecord = $DB->get_record($cm->modname, array('id' => $cm->instance), '*', MUST_EXIST);
+                // File and function exist as per module_has_will_extend_navigation, no need to check again
+                require_once($file);
+                $activity->nodetype = $function($activity, $course, $activityrecord, $cm) ? navigation_node::NODETYPE_BRANCH : navigation_node::NODETYPE_LEAF;
+            } else {
+                // Default to NODETYPE_BRANCH if no will_extend function exists
+                $activity->nodetype = navigation_node::NODETYPE_BRANCH;
+            }
         }
         return $activitynode;
     }
@@ -2097,6 +2118,30 @@ class global_navigation extends navigation_node {
             }
         }
         return $extendingmodules[$modname];
+    }
+
+    /**
+     * This method simply checks to see if a given module has a function to determine
+     * whether it will actually extend the navigation.
+     *
+     * TODO: A shared caching solution should be used to save details on what extends navigation
+     *
+     * @param string $modname
+     * @return bool
+     */
+    protected static function module_has_will_extend_navigation($modname) {
+        global $CFG;
+        static $haswillextendmodules = array();
+        if (!array_key_exists($modname, $haswillextendmodules)) {
+            $haswillextendmodules[$modname] = false;
+            $file = $CFG->dirroot.'/mod/'.$modname.'/lib.php';
+            if (file_exists($file)) {
+                $function = $modname.'_will_extend_navigation';
+                require_once($file);
+                $haswillextendmodules[$modname] = (function_exists($function));
+            }
+        }
+        return $haswillextendmodules[$modname];
     }
     /**
      * Extends the navigation for the given user.
