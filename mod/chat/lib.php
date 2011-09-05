@@ -1287,6 +1287,26 @@ function chat_extend_navigation($navigation, $course, $module, $cm) {
 }
 
 /**
+ * This function determines whether there will actually be any children under this node
+ *
+ * @param navigation_node $navigation The folder node within the global navigation
+ * @param stdClass $course The course object returned from the DB
+ * @param stdClass $module The module object returned from the DB
+ * @param stdClass $cm The course module instance returned from the DB
+ */
+function chat_will_extend_navigation($navigation, $course, $module, $cm) {
+    if (has_capability('mod/chat:chat', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+        return true;
+    }
+    $currentgroup = groups_get_activity_group($cm, true);
+    $chatusers = chat_get_users($cm->instance, $currentgroup, $cm->groupingid);
+    if (is_array($chatusers) && count($chatusers)>0) {
+        return true;
+    }
+    return false;
+}
+
+/**
  * Adds module specific settings to the settings block
  *
  * @param settings_navigation $settings The settings navigation object

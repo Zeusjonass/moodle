@@ -1353,6 +1353,18 @@ function workshop_extend_navigation(navigation_node $navref, stdclass $course, s
 }
 
 /**
+ * This function determines whether there will actually be any children under this node
+ *
+ * @param navigation_node $navigation The folder node within the global navigation
+ * @param stdClass $course The course object returned from the DB
+ * @param stdClass $module The module object returned from the DB
+ * @param stdClass $cm The course module instance returned from the DB
+ */
+function workshop_will_extend_navigation($navigation, $course, $module, $cm) {
+    return has_capability('mod/workshop:submit', get_context_instance(CONTEXT_MODULE, $cm->id));
+}
+
+/**
  * Extends the settings navigation with the Workshop settings
 
  * This function is called when the context for the page is a workshop module. This is not called by AJAX

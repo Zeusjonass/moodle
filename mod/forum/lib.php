@@ -7614,6 +7614,27 @@ function forum_extend_navigation($navref, $course, $module, $cm) {
 *************************/
 
 /**
+ * This function determines whether there will actually be any children under this node
+ *
+ * @param navigation_node $navigation The folder node within the global navigation
+ * @param stdClass $course The course object returned from the DB
+ * @param stdClass $module The module object returned from the DB
+ * @param stdClass $cm The course module instance returned from the DB
+ */
+/*************************************************
+function forum_will_extend_navigation($navigation, $course, $module, $cm) {
+    $limit = 5;
+
+    $discussions = forum_get_discussions($cm,"d.timemodified DESC", false, -1, $limit);
+    $discussioncount = forum_get_discussions_count($cm);
+    if (!is_array($discussions) || count($discussions)==0) {
+        return false;
+    }
+    return true;
+}
+*************************/
+
+/**
  * Adds module specific settings to the settings block
  *
  * @param settings_navigation $settings The settings navigation object

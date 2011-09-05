@@ -559,6 +559,54 @@ function wiki_extend_navigation(navigation_node $navref, $course, $module, $cm) 
         }
     }
 }
+
+/**
+ * This function determines whether there will actually be any children under this node
+ *
+ * @param navigation_node $navigation The folder node within the global navigation
+ * @param stdClass $course The course object returned from the DB
+ * @param stdClass $module The module object returned from the DB
+ * @param stdClass $cm The course module instance returned from the DB
+ */
+function wiki_will_extend_navigation($navigation, $course, $module, $cm) {
+    global $CFG, $PAGE, $USER;
+
+    require_once($CFG->dirroot . '/mod/wiki/locallib.php');
+
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $url = $PAGE->url;
+    $userid = 0;
+    if ($module->wikimode == 'individual') {
+        $userid = $USER->id;
+    }
+
+    if (!$wiki = wiki_get_wiki($cm->instance)) {
+        return false;
+    }
+
+    if (!$gid = groups_get_activity_group($cm)) {
+        $gid = 0;
+    }
+    if (!$subwiki = wiki_get_subwiki_by_group($cm->instance, $gid, $userid)) {
+        return false;
+    }
+
+    if (has_capability('mod/wiki:createpage', $context)) {
+        return true;
+    }
+
+    $pageid = $url->param('pageid');
+    $cmid = $url->param('id');
+    if (empty($pageid) && !empty($cmid)) {
+        // wiki main page
+        $page = wiki_get_page_by_title($swid, $wiki->firstpagetitle);
+        $pageid = $page->id;
+    }
+
+    if (is_numeric($pageid) && has_any_capability(array('mod/wiki:viewpage', 'mod/wiki:editpage', 'mod/wiki:viewcomment'), $context)) {
+        return true;
+    }
+}
 /**
  * Returns all other caps used in wiki module
  *

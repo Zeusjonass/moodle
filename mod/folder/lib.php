@@ -338,6 +338,21 @@ function folder_extend_navigation($navigation, $course, $module, $cm) {
 }
 
 /**
+ * This function determines whether there will actually be any children under this node
+ *
+ * @param navigation_node $navigation The folder node within the global navigation
+ * @param stdClass $course The course object returned from the DB
+ * @param stdClass $module The module object returned from the DB
+ * @param stdClass $cm The course module instance returned from the DB
+ */
+function folder_will_extend_navigation($navigation, $course, $module, $cm) {
+    /**
+     * This module's _extend_navigation function is a stub; return false
+     */
+    return false;
+}
+
+/**
  * Return a list of page types
  * @param string $pagetype current page type
  * @param stdClass $parentcontext Block's parent context

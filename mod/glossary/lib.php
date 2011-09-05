@@ -2741,6 +2741,21 @@ function glossary_extend_navigation($navigation, $course, $module, $cm) {
 }
 
 /**
+ * This function determines whether there will actually be any children under this node
+ *
+ * @param navigation_node $navigation The folder node within the global navigation
+ * @param stdClass $course The course object returned from the DB
+ * @param stdClass $module The module object returned from the DB
+ * @param stdClass $cm The course module instance returned from the DB
+ */
+function glossary_will_extend_navigation($navigation, $course, $module, $cm) {
+    /**
+     * This module always adds nodes; just return true
+     */
+    return true;
+}
+
+/**
  * Adds module specific settings to the settings block
  *
  * @param settings_navigation $settings The settings navigation object
