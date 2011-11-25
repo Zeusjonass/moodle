@@ -251,6 +251,10 @@
         $COURSE->javascriptportal->print_javascript($course->id);
     }
 
+    if ($PAGE->user_is_editing()) {
+        print_choose_mod_to_add_form($course);
+    }
+
 
     echo $OUTPUT->footer();
 

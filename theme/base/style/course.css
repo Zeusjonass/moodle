@@ -123,3 +123,85 @@
 
 #page-course-index.dir-rtl .category .image {padding-left: 5px; padding-right: 0px;}
 #page-course-index.dir-rtl .indentation {padding-left: 0px;padding-right: 30px;}
+
+/* Hide the dialog and it's title */
+#modchooserdialogue,
+#modchoosertitle {
+    display:none;
+}
+
+#modchoosercontainer #choosemod .submitbuttons {
+    margin: 0.7em 0;
+    text-align: center;
+}
+
+/* Set various options for the options area */
+#modchoosercontainer #choosemod .options {
+    position: relative;
+    border-bottom: 1px solid grey;
+    padding: 0.24em 0;
+}
+
+#modchoosercontainer #choosemod .options div.separator {
+    border-bottom: 1px solid grey;
+}
+
+/* Only set these options if we're showing the js container */
+body.jsenabled #modchoosercontainer #choosemod .modoptions {
+    max-height: 530px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-width: 17.65em;
+}
+
+#modchoosercontainer #choosemod .modoption {
+    margin-bottom: 0;
+    padding: 0 0 0 0.3em;
+}
+
+#modchoosercontainer #choosemod .subtype {
+    margin-bottom: 0;
+    padding: 0 0 0 1em;
+}
+
+#modchoosercontainer #choosemod .modoption .typename,
+#modchoosercontainer #choosemod .modoption span.modicon img.icon {
+    padding: 0 0 0 0.3em;
+}
+
+#modchoosercontainer #choosemod .modoption input[type=radio],
+#modchoosercontainer #choosemod .modoption span.typename,
+#modchoosercontainer #choosemod .modoption span.modicon {
+    vertical-align: middle;
+}
+
+#modchoosercontainer #choosemod .modoption label {
+    display: block;
+    padding: 0.2em 0 0.2em 0;
+}
+
+#modchoosercontainer #choosemod .instruction,
+#modchoosercontainer #choosemod .typesummary {
+    display: none;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 18em;
+    margin: 0;
+    border-left: 1px solid grey;
+    padding: 0.3em 0.5em;
+    background-color: white;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 530px;
+}
+
+#modchoosercontainer #choosemod .instruction,
+#modchoosercontainer #choosemod .selected .typesummary {
+    display: block;
+}
+
+#modchoosercontainer #choosemod .selected {
+    background-color: #ddd;
+}

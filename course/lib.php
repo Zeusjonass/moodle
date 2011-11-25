@@ -1847,7 +1847,7 @@ function print_section_add_menus($course, $section, $modnames, $vertical=false, 
     $straddactivity = get_string('addactivity');
     $straddresource = get_string('addresource');
 
-    $output  = '<div class="section_add_menus">';
+    $output  = '<div class="section_add_menus" id="add_menus-section-' . $section . '">';
 
     if (!$vertical) {
         $output .= '<div class="horizontal">';
@@ -4388,4 +4388,24 @@ function course_page_type_list($pagetype, $parentcontext, $currentcontext) {
             'course-view-*'=>get_string('page-course-view-x', 'pagetype')
         );
     }
+}
+
+function print_choose_mod_to_add_form($course, $modnames = null) {
+    global $PAGE;
+
+    // Add the required Javascript
+    $PAGE->requires->yui_module('moodle-course-modchooser',
+        'M.course.init_chooser',
+        array(array('courseid' => $course->id))
+    );
+    $PAGE->requires->string_for_js('addresourceoractivity', 'moodle');
+    $PAGE->requires->string_for_js('addresourceoractivity', 'moodle');
+
+    // Retrieve the list of available mods
+    if ($modnames === null) {
+        get_all_mods($course->id, $mods, $modnames, $modnamesplural, $modnamesused);
+    }
+    $modules = get_module_metadata($course, $modnames);
+    $renderer = $PAGE->get_renderer('core', 'course');
+    echo $renderer->course_modchooser($modules, $course);
 }

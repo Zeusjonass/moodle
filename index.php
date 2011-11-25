@@ -138,6 +138,7 @@
 
             if ($editing) {
                 print_section_add_menus($SITE, $section->section, $modnames);
+                print_choose_mod_to_add_form($SITE, $modnames);
             }
             echo $OUTPUT->box_end();
         }
