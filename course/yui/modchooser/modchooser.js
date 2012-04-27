@@ -34,45 +34,12 @@ YUI.add('moodle-course-modchooser', function(Y) {
                 this.overlay.hide();
                 this.overlay.render();
 
-                // Build the add Link
-                addimg = Y.Node.create('<img />');
-                addimg.set('alt', M.str.moodle.addresourceoractivity);
-                addimg.set('src', M.util.image_url('t/add'));
-                addimg.addClass('activityicon');
-
-                addtext = Y.Node.create('<span></span>');
-                addtext.set('innerHTML', M.str.moodle.addresourceoractivity);
-                addtext.addClass('instancename');
-
-                addlink = Y.Node.create('<a></a>');
-                addlink.set('href', '#');
-                addlink.appendChild(addimg);
-                addlink.append('&nbsp;');
-                addlink.appendChild(addtext);
-
-                adddiv = Y.Node.create('<div></div>');
-                adddiv.addClass('mod-indent');
-                adddiv.appendChild(addlink);
-
-                addcontent = Y.Node.create('<li></li>');
-                addcontent.addClass('activity');
-                addcontent.appendChild(adddiv);
-
                 // Replace each menu section with a handler
                 Y.all('.course-content li.section').each(function(section) {
                     // Determine the sectionid for this section
-                    var addsectionid = section.get('id').replace('section-', '');
-                    sectionaddcontent = addcontent.cloneNode(true);
-                    sectionaddcontent.on('click', this.display_chooser, this, addsectionid);
-
-                    if (section.one('ul.section') == null) {
-                        sectionul = Y.Node.create('<ul class="section img-text"></ul>');
-                        section.one('.content').appendChild(sectionul);
-                    }
-                    var sectionarea = section.one('ul.section').appendChild(sectionaddcontent);
-
-                    // Remove the add links if they're visible on this page
-                    section.all('.section_add_menus').remove();
+                    var sectionid = section.get('id').replace('section-', '');
+                    sectionaddcontent = section.one('.section_add_module .mod-indent');
+                    sectionaddcontent.on('click', this.display_chooser, this, sectionid);
                 }, this);
 
                 // Replace the frontpage menu too

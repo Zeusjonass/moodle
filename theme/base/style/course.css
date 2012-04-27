@@ -6,6 +6,10 @@
 .section_add_menus .horizontal form {display:inline;}
 .section_add_menus optgroup {font-weight:normal;font-style: italic;}
 
+.jsenabled .section_add_menus {display:none;}
+.section_add_module .mod-indent {display:none;}
+.jsenabled .section_add_module .mod-indent {display:block;}
+
 .course-content .section .activity img.activityicon {vertical-align:middle;height:16px;width:16px;}
 .course-content .section .activity .commands img.iconsmall {vertical-align: baseline;}
 

@@ -1846,8 +1846,15 @@ function print_section_add_menus($course, $section, $modnames, $vertical=false, 
 
     $straddactivity = get_string('addactivity');
     $straddresource = get_string('addresource');
+    $straddeither = get_string('addresourceoractivity');
 
-    $output  = '<div class="section_add_menus" id="add_menus-section-' . $section . '">';
+    $output = '<div class="section_add_module">';
+    $output .= '<div class="mod-indent"><a href="#">';
+    $output .= '<img alt="'.$straddeither.'" src="'.$OUTPUT->pix_url('t/add').'" class="activityicon">&nbsp;';
+    $output .= '<span class="instancename">'.$straddeither.'</span>';
+    $output .= '</a></div>';
+
+    $output .= '<div class="section_add_menus" id="add_menus-section-' . $section . '">';
 
     if (!$vertical) {
         $output .= '<div class="horizontal">';
@@ -1869,6 +1876,7 @@ function print_section_add_menus($course, $section, $modnames, $vertical=false, 
         $output .= '</div>';
     }
 
+    $output .= '</div>';
     $output .= '</div>';
 
     if ($return) {
