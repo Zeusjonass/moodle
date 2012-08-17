@@ -76,25 +76,29 @@ YUI.add('moodle-course-dragdrop', function(Y) {
                         if (movedown) {
                             movedown.remove();
                         }
-
-                        // Make each li element in the lists of sections draggable
-                        var dd = new Y.DD.Drag({
-                            node: sectionnode,
-                            // Make each li a Drop target too
-                            groups: this.groups,
-                            target: true,
-                            handles: ['.'+CSS.LEFT]
-                        }).plug(Y.Plugin.DDProxy, {
-                            // Don't move the node at the end of the drag
-                            moveOnEnd: false
-                        }).plug(Y.Plugin.DDConstrained, {
-                            // Keep it inside the .course-content
-                            constrain: '#'+CSS.PAGECONTENT,
-                            stickY: true
-                        }).plug(Y.Plugin.DDWinScroll);
                     }
                 }
             }, this);
+
+            // Make each li element in the lists of sections draggable
+            var nodeselector = baseselector.slice(CSS.COURSECONTENT.length+2);
+            var del = new Y.DD.Delegate({
+                container: '.'+CSS.COURSECONTENT,
+                nodes: nodeselector,
+                target: true,
+                handles: ['.'+CSS.LEFT],
+                dragConfig: {groups: this.groups}
+            });
+            del.dd.plug(Y.Plugin.DDProxy, {
+                // Don't move the node at the end of the drag
+                moveOnEnd: false
+            });
+            del.dd.plug(Y.Plugin.DDConstrained, {
+                // Keep it inside the .course-content
+                constrain: '#'+CSS.PAGECONTENT,
+                stickY: true
+            });
+            del.dd.plug(Y.Plugin.DDWinScroll);
         },
 
         get_section_id : function(node) {
