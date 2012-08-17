@@ -278,7 +278,7 @@ YUI.add('moodle-course-dragdrop', function(Y) {
                     padding: '20 0 20 0'
                 });
                 // Go through each li element and make them draggable
-                this.setup_for_resource('#'+sectionnode.get('id')+' li.'+CSS.ACTIVITY);
+                this.setup_for_resource('#'+sectionnode.get('id'), 'li.'+CSS.ACTIVITY);
             }, this);
         },
         /**
@@ -287,28 +287,30 @@ YUI.add('moodle-course-dragdrop', function(Y) {
          * @param baseselector The CSS selector or node to limit scope to
          * @return void
          */
-        setup_for_resource : function(baseselector) {
-            Y.Node.all(baseselector).each(function(resourcesnode) {
+        setup_for_resource : function(baseselector, nodeselector) {
+            Y.Node.all(baseselector + ' ' + nodeselector).each(function(resourcesnode) {
                 // Replace move icons
                 var move = resourcesnode.one('a.'+CSS.EDITINGMOVE);
                 if (move) {
                     move.replace(this.get_drag_handle(M.str.moodle.move, CSS.EDITINGMOVE, CSS.ICONCLASS));
-                    // Make each li element in the lists of sections draggable
-                    var dd = new Y.DD.Drag({
-                        node: resourcesnode,
-                        groups: this.groups,
-                        // Make each li a Drop target too
-                        target: true,
-                        handles: ['.' + CSS.EDITINGMOVE]
-                    }).plug(Y.Plugin.DDProxy, {
-                        // Don't move the node at the end of the drag
-                        moveOnEnd: false
-                    }).plug(Y.Plugin.DDConstrained, {
-                        // Keep it inside the .course-content
-                        constrain: '#'+CSS.PAGECONTENT
-                    }).plug(Y.Plugin.DDWinScroll);
                 }
             }, this);
+            var del = new Y.DD.Delegate({
+                container: baseselector,
+                nodes: nodeselector,
+                target: true,
+                handles: ['.' + CSS.EDITINGMOVE],
+                dragConfig: {groups: this.groups}
+            });
+            del.dd.plug(Y.Plugin.DDProxy, {
+                // Don't move the node at the end of the drag
+                moveOnEnd: false
+            });
+            del.dd.plug(Y.Plugin.DDConstrained, {
+                // Keep it inside the .course-content
+                constrain: '#'+CSS.PAGECONTENT
+            });
+            del.dd.plug(Y.Plugin.DDWinScroll);
         },
 
         get_section_id : function(node) {
