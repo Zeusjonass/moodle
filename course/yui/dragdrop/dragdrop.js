@@ -244,6 +244,7 @@ YUI.add('moodle-course-dragdrop', function(Y) {
             this.groups = ['resource'];
             this.samenodeclass = CSS.ACTIVITY;
             this.parentnodeclass = CSS.SECTION;
+            this.resourcedraghandle = this.get_drag_handle(M.str.moodle.move, CSS.EDITINGMOVE, CSS.ICONCLASS);
 
             // Go through all sections
             var sectionlistselector = M.course.format.get_section_selector(Y);
@@ -292,7 +293,7 @@ YUI.add('moodle-course-dragdrop', function(Y) {
                 // Replace move icons
                 var move = resourcesnode.one('a.'+CSS.EDITINGMOVE);
                 if (move) {
-                    move.replace(this.get_drag_handle(M.str.moodle.move, CSS.EDITINGMOVE, CSS.ICONCLASS));
+                    move.replace(this.resourcedraghandle.cloneNode(true));
                 }
             }, this);
             var del = new Y.DD.Delegate({
