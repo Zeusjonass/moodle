@@ -1390,6 +1390,7 @@ class core_renderer extends renderer_base {
      */
     protected function render_url_select(url_select $select) {
         global $CFG;
+        static $hasjs = false;
 
         $select = clone($select);
         if (empty($select->formid)) {
@@ -1471,7 +1472,10 @@ class core_renderer extends renderer_base {
             $go = html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('go')));
             $output .= html_writer::tag('noscript', html_writer::tag('div', $go), array('style'=>'inline'));
             $nothing = empty($select->nothing) ? false : key($select->nothing);
-            $output .= $this->page->requires->js_init_call('M.util.init_url_select', array($select->formid, $select->attributes['id'], $nothing));
+            if (!$hasjs) {
+                $output .= $this->page->requires->js_init_call('M.util.init_url_selects');
+                $hasjs = true;
+            }
         } else {
             $output .= html_writer::empty_tag('input', array('type'=>'submit', 'value'=>$select->showbutton));
         }
