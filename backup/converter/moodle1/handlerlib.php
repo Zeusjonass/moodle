@@ -1988,7 +1988,62 @@ abstract class moodle1_resource_successor_handler extends moodle1_mod_handler {
  * Base class for block handlers
  */
 abstract class moodle1_block_handler extends moodle1_plugin_handler {
+    public function process_block(array $data) {
+        $newdata = array();
+        $instanceid     = $data['id'];
+        $contextid = $this->converter->get_contextid(CONTEXT_BLOCK, $data['id']);
 
+        $newdata['blockname'] = $data['name'];
+        $newdata['parentcontextid'] = $this->converter->get_contextid(CONTEXT_COURSE, 0);
+        $newdata['showinsubcontexts'] = 0;
+        $newdata['pagetypepattern'] = $data['pagetype'].='-*';
+        $newdata['subpagepattern'] = '$@NULL@$';
+        $newdata['defaultregion'] = ($data['position']=='l')?'side-pre':'side-post';
+        $newdata['defaultweight'] = $data['weight'];
+        $newdata['configdata'] = $data['configdata'];
+
+        // block.xml
+        $this->open_xml_writer("course/blocks/{$data['name']}/block.xml");
+        $this->xmlwriter->begin_tag('block', array('id' => $instanceid, 'contextid' => $contextid));
+
+        foreach ($newdata as $field => $value) {
+            $this->xmlwriter->full_tag($field, $value);
+        }
+
+        $this->xmlwriter->begin_tag('block_positions');
+        $this->xmlwriter->begin_tag('block_position', array('id' => 1));
+        $this->xmlwriter->full_tag('contextid', $newdata['parentcontextid']);
+        $this->xmlwriter->full_tag('pagetype', $data['pagetype']);
+        $this->xmlwriter->full_tag('subpage', '');
+        $this->xmlwriter->full_tag('visible', $data['visible']);
+        $this->xmlwriter->full_tag('region', $newdata['defaultregion']);
+        $this->xmlwriter->full_tag('weight', $newdata['defaultweight']);
+        $this->xmlwriter->end_tag('block_position');
+        $this->xmlwriter->end_tag('block_positions');
+        $this->xmlwriter->end_tag('block');
+        $this->close_xml_writer();
+
+        // inforef.xml
+        $this->open_xml_writer("course/blocks/{$data['name']}/inforef.xml");
+        $this->xmlwriter->begin_tag('inforef');
+        // TODO: inforef contents if needed
+        $this->xmlwriter->end_tag('inforef');
+        $this->close_xml_writer();
+
+        // roles.xml
+        $this->open_xml_writer("course/blocks/{$data['name']}/roles.xml");
+        $this->xmlwriter->begin_tag('roles');
+        $this->xmlwriter->begin_tag('role_overrides');
+        // TODO: role overrides if needed
+        $this->xmlwriter->end_tag('role_overrides');
+        $this->xmlwriter->begin_tag('role_assignments');
+        // TODO: role assignments if needed
+        $this->xmlwriter->end_tag('role_assignments');
+        $this->xmlwriter->end_tag('roles');
+        $this->close_xml_writer();
+
+        return $data;
+    }
 }
 
 
