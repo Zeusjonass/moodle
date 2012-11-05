@@ -88,10 +88,16 @@ abstract class moodle1_handlers_factory {
         foreach ($plugins as $name => $dir) {
             $handlerfile  = $dir . '/backup/moodle1/lib.php';
             $handlerclass = "moodle1_{$type}_{$name}_handler";
-            if (!file_exists($handlerfile)) {
-                continue;
+            if ($type != "block") {
+                if (!file_exists($handlerfile)) {
+                    continue;
+                }
+                require_once($handlerfile);
+            } else {
+                if (!file_exists($handlerfile)) {
+                    $handlerclass = "moodle1_block_generic_handler";
+                }
             }
-            require_once($handlerfile);
 
             if (!class_exists($handlerclass)) {
                 throw new moodle1_convert_exception('missing_handler_class', $handlerclass);
@@ -1988,6 +1994,14 @@ abstract class moodle1_resource_successor_handler extends moodle1_mod_handler {
  * Base class for block handlers
  */
 abstract class moodle1_block_handler extends moodle1_plugin_handler {
+
+    public function get_paths() {
+        $blockname = strtoupper($this->pluginname);
+        return array(
+            new convert_path('block', "/MOODLE_BACKUP/COURSE/BLOCKS/BLOCK/{$blockname}"),
+        );
+    }
+
     public function process_block(array $data) {
         $newdata = array();
         $instanceid     = $data['id'];
@@ -2046,6 +2060,13 @@ abstract class moodle1_block_handler extends moodle1_plugin_handler {
     }
 }
 
+
+/**
+ * Base class for block generic handler
+ */
+class moodle1_block_generic_handler extends moodle1_block_handler {
+
+}
 
 /**
  * Base class for the activity modules' subplugins
