@@ -2017,7 +2017,7 @@ abstract class moodle1_block_handler extends moodle1_plugin_handler {
         $newdata['configdata'] = $data['configdata'];
 
         // block.xml
-        $this->open_xml_writer("course/blocks/{$data['name']}/block.xml");
+        $this->open_xml_writer("course/blocks/{$data['name']}_{$instanceid}/block.xml");
         $this->xmlwriter->begin_tag('block', array('id' => $instanceid, 'contextid' => $contextid));
 
         foreach ($newdata as $field => $value) {
@@ -2038,14 +2038,14 @@ abstract class moodle1_block_handler extends moodle1_plugin_handler {
         $this->close_xml_writer();
 
         // inforef.xml
-        $this->open_xml_writer("course/blocks/{$data['name']}/inforef.xml");
+        $this->open_xml_writer("course/blocks/{$data['name']}_{$instanceid}/inforef.xml");
         $this->xmlwriter->begin_tag('inforef');
         // TODO: inforef contents if needed
         $this->xmlwriter->end_tag('inforef');
         $this->close_xml_writer();
 
         // roles.xml
-        $this->open_xml_writer("course/blocks/{$data['name']}/roles.xml");
+        $this->open_xml_writer("course/blocks/{$data['name']}_{$instanceid}/roles.xml");
         $this->xmlwriter->begin_tag('roles');
         $this->xmlwriter->begin_tag('role_overrides');
         // TODO: role overrides if needed
