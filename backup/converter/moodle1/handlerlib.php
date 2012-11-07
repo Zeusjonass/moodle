@@ -88,15 +88,12 @@ abstract class moodle1_handlers_factory {
         foreach ($plugins as $name => $dir) {
             $handlerfile  = $dir . '/backup/moodle1/lib.php';
             $handlerclass = "moodle1_{$type}_{$name}_handler";
-            if ($type != "block") {
-                if (!file_exists($handlerfile)) {
-                    continue;
-                }
+            if (file_exists($handlerfile)) {
                 require_once($handlerfile);
+            } elseif ($type == 'block') {
+                $handlerclass = "moodle1_block_generic_handler";
             } else {
-                if (!file_exists($handlerfile)) {
-                    $handlerclass = "moodle1_block_generic_handler";
-                }
+                continue;
             }
 
             if (!class_exists($handlerclass)) {
