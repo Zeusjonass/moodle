@@ -602,6 +602,7 @@ class moodle1_converter extends base_converter {
         $files = self::find_referenced_files($text);
         if (!empty($files)) {
             foreach ($files as $file) {
+                $file = rawurldecode($file);
                 try {
                     $fileman->migrate_file('course_files'.$file, dirname($file));
                 } catch (moodle1_convert_exception $e) {
