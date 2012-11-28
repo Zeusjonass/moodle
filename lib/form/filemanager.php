@@ -186,7 +186,8 @@ class form_filemanaer_x {
             'context'=>$PAGE->context
             );
         foreach ($defaults as $key=>$value) {
-            if (empty($options->$key)) {
+            // Using !isset() prevents us from overwriting falsey values with defaults (as empty() did).
+            if (!isset($options->$key)) {
                 $options->$key = $value;
             }
         }
