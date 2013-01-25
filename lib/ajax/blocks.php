@@ -65,6 +65,21 @@ switch ($pagetype[0]) {
         $PAGE->set_blocks_editing_capability('moodle/my:manageblocks');
         $PAGE->blocks->add_region('content');
         break;
+    case 'user':
+        $PAGE->set_context(context_user::instance($USER->id));
+        if ($pagelayout == 'mydashboard') {
+            $PAGE->blocks->add_region('content');
+            // On user profile pages, we have some extra work to do in case it's not the user's own.
+            $blockinstance = $DB->get_record('block_instances', array('id'=>$bui_moveid), 'parentcontextid', MUST_EXIST);
+            $context = $DB->get_record('context', array('id'=>$blockinstance->parentcontextid, 'contextlevel'=>CONTEXT_USER), 'id, instanceid');
+            if ($context && $context->id != $PAGE->context->id) {
+                $PAGE->set_context(context_user::instance($context->instanceid, MUST_EXIST));
+                $PAGE->set_blocks_editing_capability('moodle/user:manageblocks');
+            } else {
+                $PAGE->set_blocks_editing_capability('moodle/user:manageownblocks');
+            }
+        }
+        break;
 }
 
 echo $OUTPUT->header(); // send headers
