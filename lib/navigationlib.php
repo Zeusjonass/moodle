@@ -3042,6 +3042,12 @@ class navbar extends navigation_node {
                     if (!$settingsactivenode->mainnavonly) {
                         $items[] = $settingsactivenode;
                     }
+                    if ($navigationactivenode->type === self::TYPE_COURSE && $navigationactivenode->parent->key === 'currentcourse') {
+                        $categories = $this->get_course_categories();
+                        foreach ($categories as $category) {
+                            $items[] = $category;
+                        }
+                    }
                     $settingsactivenode = $settingsactivenode->parent;
                 }
                 if (!$this->includesettingsbase) {
@@ -3059,6 +3065,12 @@ class navbar extends navigation_node {
                 while ($navigationactivenode && $navigationactivenode->parent !== null) {
                     if (!$navigationactivenode->mainnavonly) {
                         $items[] = $navigationactivenode;
+                    }
+                    if ($navigationactivenode->type === self::TYPE_COURSE && $navigationactivenode->parent->key === 'currentcourse') {
+                        $categories = $this->get_course_categories();
+                        foreach ($categories as $category) {
+                            $items[] = $category;
+                        }
                     }
                     $navigationactivenode = $navigationactivenode->parent;
                 }
@@ -3082,6 +3094,32 @@ class navbar extends navigation_node {
 
         $this->items = array_reverse($items);
         return $this->items;
+    }
+
+    /**
+     * Get the list of categories leading to this course.
+     *
+     * This function is used by {@link navbar::get_items()} to add back the "courses"
+     * node and category chain leading to the current course.  Note that this is only ever
+     * called for the current course, so we don't need to bother taking in any parameters.
+     *
+     * @return array
+     */
+    private function get_course_categories() {
+        $categories = array();
+        $id = $this->page->course->category;
+        while ($id) {
+            $category = get_course_category($id);
+            $categories[] = new navigation_node(array(
+                'text'=>$category->name,
+                'shorttext'=>$category->name,
+                'key'=>$category->idnumber,
+                'action'=>new moodle_url('/course/category.php', array('id'=>$id))
+            ));
+            $id = $category->parent;
+        }
+        $categories[] = $this->page->navigation->get('courses');
+        return $categories;
     }
 
     /**
