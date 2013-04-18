@@ -87,7 +87,12 @@ class base_setting_ui {
      * @return string
      */
     public function get_name() {
-        return self::NAME_PREFIX.$this->name;
+        $matches = array();
+        $name = $this->name;
+        if (preg_match('/(.+?)(_\d+)(.*)/', $name, $matches)) {
+            $name = $matches[1] . $matches[3] . '[' . substr($matches[2], 1) . ']';
+        }
+        return self::NAME_PREFIX.$name;
     }
     /**
      * Gets the name of this item including its prefix
@@ -382,7 +387,7 @@ class backup_setting_ui_checkbox extends backup_setting_ui {
         if (!empty($icon)) {
             $label .= $output->render($icon);
         }
-        return $this->apply_options(array('element'=>'checkbox','name'=>self::NAME_PREFIX.$this->name, 'label'=>$label, 'text'=>$this->text, 'attributes'=>$this->attributes));
+        return $this->apply_options(array('element'=>'checkbox','name'=>$this->get_name(), 'label'=>$label, 'text'=>$this->text, 'attributes'=>$this->attributes));
     }
     /**
      * Sets the text for the element
@@ -476,7 +481,7 @@ class backup_setting_ui_radio extends backup_setting_ui {
             $label .= $output->render($icon);
         }
         // name, label, text, value, attributes
-        return $this->apply_options(array('element'=>'radio','name'=>self::NAME_PREFIX.$this->name, 'label'=>$label, 'text'=>$this->text, 'value'=>$this->value, 'attributes'=>$this->attributes));
+        return $this->apply_options(array('element'=>'radio','name'=>$this->get_name(), 'label'=>$label, 'text'=>$this->text, 'value'=>$this->value, 'attributes'=>$this->attributes));
     }
     /**
      * Sets the text next to this input
@@ -541,7 +546,7 @@ class backup_setting_ui_select extends backup_setting_ui {
             $label .= $output->render($icon);
         }
         // name, label, options, attributes
-        return $this->apply_options(array('element'=>'select','name'=>self::NAME_PREFIX.$this->name, 'label'=>$label, 'options'=>$this->values, 'attributes'=>$this->attributes));
+        return $this->apply_options(array('element'=>'select','name'=>$this->get_name(), 'label'=>$label, 'options'=>$this->values, 'attributes'=>$this->attributes));
     }
     /**
      * Sets the options for the select box

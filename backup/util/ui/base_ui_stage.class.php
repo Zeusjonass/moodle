@@ -133,6 +133,46 @@ abstract class base_ui_stage {
     }
 
     /**
+     * Processes submitted settings for a given task.
+     *
+     * @param base_task $task Task whose settings should be processed
+     * @param object $data Data retrieved from form submission (using $form->get_data())
+     * @return int Number of settings changed by the user
+     */
+    protected function process_task_settings(base_task &$task, $data) {
+        // Get the task's settings.
+        $settings = $task->get_settings();
+        $changes = 0;
+
+        // Iterate by reference.
+        foreach ($settings as &$setting) {
+            $name = $setting->get_ui_name();
+            if (substr($name, -1) == ']') {
+                // We've used an array to get around max_input_vars; split it out into name and index.
+                $parts = explode('[', $name);
+                $name = $parts[0];
+                $index = intval($parts[1]);
+                if (isset($data->{$name}[$index]) &&  $data->{$name}[$index] != $setting->get_value()) {
+                    $setting->set_value($data->{$name}[$index]);
+                    $changes++;
+                } else if (!isset($data->{$name}[$index]) && $setting->get_ui_type() == backup_setting::UI_HTML_CHECKBOX && $setting->get_value()) {
+                    $setting->set_value(0);
+                    $changes++;
+                }
+            } else {
+                // Regular variable (not an array), so we can use the name without any further processing.
+                if (isset($data->$name) &&  $data->$name != $setting->get_value()) {
+                    $setting->set_value($data->$name);
+                    $changes++;
+                } else if (!isset($data->$name) && $setting->get_ui_type() == backup_setting::UI_HTML_CHECKBOX && $setting->get_value()) {
+                    $setting->set_value(0);
+                    $changes++;
+                }
+            }
+        }
+    }
+
+    /**
      * Processes the stage.
      *
      * This must be overridden by every stage as it will be different for every stage
