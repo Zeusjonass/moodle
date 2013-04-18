@@ -91,18 +91,7 @@ class backup_ui_stage_initial extends backup_ui_stage {
             foreach ($tasks as &$task) {
                 // We are only interesting in the backup root task for this stage
                 if ($task instanceof backup_root_task) {
-                    // Get all settings into a var so we can iterate by reference
-                    $settings = $task->get_settings();
-                    foreach ($settings as &$setting) {
-                        $name = $setting->get_ui_name();
-                        if (isset($data->$name) &&  $data->$name != $setting->get_value()) {
-                            $setting->set_value($data->$name);
-                            $changes++;
-                        } else if (!isset($data->$name) && $setting->get_ui_type() == backup_setting::UI_HTML_CHECKBOX && $setting->get_value()) {
-                            $setting->set_value(0);
-                            $changes++;
-                        }
-                    }
+                    $changes += $this->process_task_settings($task, $data);
                 }
             }
             // Return the number of changes the user made
@@ -201,19 +190,7 @@ class backup_ui_stage_schema extends backup_ui_stage {
             foreach ($tasks as &$task) {
                 // We are only interested in schema settings
                 if (!($task instanceof backup_root_task)) {
-                    // Store as a variable so we can iterate by reference
-                    $settings = $task->get_settings();
-                    // Iterate by reference
-                    foreach ($settings as &$setting) {
-                        $name = $setting->get_ui_name();
-                        if (isset($data->$name) &&  $data->$name != $setting->get_value()) {
-                            $setting->set_value($data->$name);
-                            $changes++;
-                        } else if (!isset($data->$name) && $setting->get_ui_type() == backup_setting::UI_HTML_CHECKBOX && $setting->get_value()) {
-                            $setting->set_value(0);
-                            $changes++;
-                        }
-                    }
+                    $changes += $this->process_task_settings($task, $data);
                 }
             }
             // Return the number of changes the user made
