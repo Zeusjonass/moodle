@@ -497,7 +497,8 @@ class stored_file {
             }
         }
         $mimetype = $this->get_mimetype();
-        if (!preg_match('|^image/|', $mimetype) || !filesize($path) || !($imageinfo = getimagesize($path))) {
+        // The getimagesize() function also works on SWF files.
+        if (!($mimetype === 'application/x-shockwave-flash' || preg_match('|^image/|', $mimetype)) || !filesize($path) || !($imageinfo = @getimagesize($path))) {
             return false;
         }
         $image = array('width'=>$imageinfo[0], 'height'=>$imageinfo[1], 'mimetype'=>image_type_to_mime_type($imageinfo[2]));
