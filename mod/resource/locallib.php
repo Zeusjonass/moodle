@@ -91,7 +91,11 @@ function resource_display_embed($resource, $cm, $course, $file) {
 
     } else if ($mediarenderer->can_embed_url($moodleurl, $embedoptions)) {
         // Media (audio/video) file.
-        $code = $mediarenderer->embed_url($moodleurl, $title, 0, 0, $embedoptions);
+        if (!$dimensions = $file->get_imageinfo()) {
+            // Couldn't get dimensions - probably unsupported type (only SWF and images are supported).  Use defaults instead.
+            $dimensions = array('width'=>0, 'height'=>0);
+        }
+        $code = $mediarenderer->embed_url($moodleurl, $title, $dimensions['width'], $dimensions['height'], $embedoptions);
 
     } else {
         // anything else - just try object tag enlarged as much as possible
