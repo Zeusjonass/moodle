@@ -817,8 +817,58 @@ function data_submitted() {
     if (empty($_POST)) {
         return false;
     } else {
-        return (object)fix_utf8($_POST);
+        return (object)fix_utf8(get_all_post_params());
     }
+}
+
+/**
+ * Get all POST variables, bypassing max_input_vars limit if needed.
+ *
+ * @return array All POST variables as an array, in the same format as $_POST.
+ */
+function get_all_post_params() {
+    $enctype = $_SERVER["CONTENT_TYPE"];
+    $max = (int)ini_get('max_input_vars');
+
+    if (empty($max) || count($_POST, COUNT_RECURSIVE) < $max || (!empty($enctype) && $enctype == 'multipart/form-data')) {
+        return $_POST;
+    }
+
+    // Large POST request with enctype supported by php://input.
+    // Parse php://input in chunks to bypass max_input_vars limit, which also applies to parse_str().
+    $allvalues = array();
+    $values = array();
+    $str = file_get_contents("php://input");
+    $delim = '&';
+
+    $fun = create_function('$p', 'return implode("'.$delim.'", $p);');
+    $chunks = array_map($fun, array_chunk(explode($delim, $str), $max));
+
+    foreach ($chunks as $chunk) {
+        parse_str($chunk, $values);
+        $allvalues = array_merge_recursive_preserving_indices($allvalues, $values);
+    }
+
+    return $allvalues;
+}
+
+/**
+ * Merge one array into another recursively, preserving array indices.
+ * Any duplicate keys which are not arrays will take the second array's value.
+ *
+ * @param array $arr1 the first array, into which the second will be merged.
+ * @param array $arr2 the second array, which will be merged into the first.
+ * @return array A copy of the first array with second array's contents merged into it.
+ */
+function array_merge_recursive_preserving_indices($arr1, $arr2) {
+    foreach ($arr2 as $key=>$value) {
+        if (array_key_exists($key, $arr1) && is_array($arr1[$key])) {
+            $arr1[$key] = array_merge_recursive_preserving_indices($arr1[$key], $arr2[$key]);
+            continue;
+        }
+        $arr1[$key] = $value;
+    }
+    return $arr1;
 }
 
 /**
