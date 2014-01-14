@@ -2808,6 +2808,16 @@ function require_login($courseorid = NULL, $autologinguest = true, $cm = NULL, $
         $preventredirect = true;
     }
 
+    // Don't redirect MS Word when it checks if the page is a .doc(x) file.  Otherwise, users will just end up on login page,
+    // or even worse, a page saying "you're already logged in".  Microsoft blame the rest of the world (see http://support.microsoft.com/kb/899927).
+    if (check_browser_version('MS Word') && !isloggedin()) {
+    	// We can't throw an exception or use print_error() as we need to return a 200 OK status.  This message shouldn't actually be seen
+    	// by a real user, except possibly in very strange circumstances (iframes in Word docs?).
+    	$PAGE->set_context(context_system::instance());
+    	notice('This website cannot be viewed correctly in Microsoft Word.  Please view this website in your web browser.', $CFG->wwwroot .'/');
+    	exit;
+    }
+
     // setup global $COURSE, themes, language and locale
     if (!empty($courseorid)) {
         if (is_object($courseorid)) {
@@ -8937,6 +8947,26 @@ function check_php_version($version='5.2.4') {
           }
           if (preg_match("/AppleWebKit\/([0-9]+)/i", $agent, $match)) {
               if (version_compare($match[1], $version) >= 0) {
+                  return true;
+              }
+          }
+          break;
+
+      case 'MS Word':  /// Microsoft Word - not recommended to check for specific version.
+          $isOffice = false;
+          if (!preg_match("/(ms-office|Word|MSOffice|Microsoft Office)/i", $agent)) {
+              return false;
+          }
+          if (strpos($agent, 'Outlook') !== false) {
+             return false;
+          }
+          // It's Office and not Outlook - so it's probably Word, but we can't really be sure in most cases.
+          if (empty($version)) {
+              return true;
+          }
+          // Version is not always provided, so you may get a false negative if you check for a specific version.
+          if (preg_match("/(Word\/|MSOffice |Microsoft Office\/)([0-9.]+)/i", $agent, $match)) {
+              if (version_compare($match[2], $version) >= 0) {
                   return true;
               }
           }
