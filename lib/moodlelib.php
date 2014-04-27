@@ -2821,6 +2821,17 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         $preventredirect = true;
     }
 
+    // Don't redirect MS Word when it checks if the page is a .doc(x) file.  Otherwise, users will just end up on login page,
+    // or even worse, a page saying "you're already logged in".
+    // Microsoft blame the rest of the world (see http://support.microsoft.com/kb/899927).
+    if (core_useragent::is_msword() && !isloggedin()) {
+    	// We can't throw an exception or use print_error() as we need to return a 200 OK status.  This message shouldn't actually
+    	// be seen by a real user, except possibly in very strange circumstances (iframes in Word docs?).
+    	$PAGE->set_context(context_system::instance());
+    	notice('This website cannot be viewed correctly in Microsoft Word.  Please use a web browser.', $CFG->wwwroot .'/');
+    	exit;
+    }
+
     // Setup global $COURSE, themes, language and locale.
     if (!empty($courseorid)) {
         if (is_object($courseorid)) {
