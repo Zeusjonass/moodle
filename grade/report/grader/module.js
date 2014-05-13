@@ -478,6 +478,10 @@ M.gradereport_grader.classes.ajax.prototype.get_next_cell = function(cell) {
     if (!next) {
         next = this.current.node;
     }
+    if (next.one('span.gradevalue') || this.report.items[this.report.get_cell_info(next).itemid].type == 'none') {
+        // This grade is locked or item is ungraded - skip to the next one.
+        next = this.get_next_cell(next);
+    }
     return next;
 };
 /**
@@ -497,6 +501,10 @@ M.gradereport_grader.classes.ajax.prototype.get_prev_cell = function(cell) {
     }
     if (!next) {
         next = this.current.node;
+    }
+    if (next.one('span.gradevalue') || this.report.items[this.report.get_cell_info(next).itemid].type == 'none') {
+        // This grade is locked or item is ungraded - skip to the next one.
+        next = this.get_prev_cell(next);
     }
     return next;
 };
@@ -522,6 +530,10 @@ M.gradereport_grader.classes.ajax.prototype.get_above_cell = function(cell) {
     if (!next) {
         next = this.current.node;
     }
+    if (next.one('span.gradevalue')) {
+        // This grade is locked - skip to the next one.
+        next = this.get_above_cell(next);
+    }
     return next;
 };
 /**
@@ -542,6 +554,10 @@ M.gradereport_grader.classes.ajax.prototype.get_below_cell = function(cell) {
             column++;
         }
         next = tr.all('td.cell').item(column);
+    }
+    if (next.one('span.gradevalue')) {
+        // This grade is locked - skip to the next one.
+        next = this.get_below_cell(next);
     }
     // next will be null when we get to the bottom of a column
     return next;
@@ -747,6 +763,11 @@ M.gradereport_grader.classes.existingfield = function(ajax, userid, itemid) {
     this.itemid = itemid;
     this.editfeedback = ajax.showquickfeedback;
     this.grade = this.report.Y.one('#grade_'+userid+'_'+itemid);
+
+    if (!this.grade) {
+        // No field for this grade for this user - it's probably locked.
+        return;
+    }
 
     if (this.report.grades) {
         for (var i = 0; i < this.report.grades.length; i++) {
