@@ -821,7 +821,8 @@ class grade_report_grader extends grade_report {
                 $scaleslist[] = $item->scaleid;
                 $jsarguments['items'][$itemid] = array('id'=>$itemid, 'name'=>$item->get_name(true), 'type'=>'scale', 'scale'=>$item->scaleid, 'decimals'=>$item->get_decimals());
             } else {
-                $jsarguments['items'][$itemid] = array('id'=>$itemid, 'name'=>$item->get_name(true), 'type'=>'value', 'scale'=>false, 'decimals'=>$item->get_decimals());
+                $gradetype = ($item->gradetype == GRADE_TYPE_TEXT) ? 'none' : 'value';
+                $jsarguments['items'][$itemid] = array('id'=>$itemid, 'name'=>$item->get_name(true), 'type'=>$gradetype, 'scale'=>false, 'decimals'=>$item->get_decimals());
             }
             $tabindices[$item->id]['grade'] = $gradetabindex;
             $tabindices[$item->id]['feedback'] = $gradetabindex + $numusers;
