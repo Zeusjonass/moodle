@@ -346,6 +346,28 @@ class core_medialib_testcase extends advanced_testcase {
         $url = new moodle_url('http://www.youtube.com/v/vyrwMmsufJc');
         $t = $renderer->embed_url($url);
         $this->assertContains('</iframe>', $t);
+        $url = new moodle_url('http://youtu.be/JNJMF1l3udM');
+        $t = $renderer->embed_url($url);
+        $this->assertContains('</iframe>', $t);
+
+        // Format: youtube video within playlist.
+        $url = new moodle_url('https://www.youtube.com/watch?v=dv2f_xfmbD8&index=4&list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0');
+        $t = $renderer->embed_url($url);
+        $this->assertContains('</iframe>', $t);
+        $this->assertContains('list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0', $t);
+
+        // Format: youtube video with start time.
+        $url = new moodle_url('https://www.youtube.com/watch?v=JNJMF1l3udM&t=1h11s');
+        $t = $renderer->embed_url($url);
+        $this->assertContains('</iframe>', $t);
+        $this->assertContains('start=3611', $t);
+
+        // Format: youtube video within playlist with start time.
+        $url = new moodle_url('https://www.youtube.com/watch?v=dv2f_xfmbD8&index=4&list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0&t=1m5s');
+        $t = $renderer->embed_url($url);
+        $this->assertContains('</iframe>', $t);
+        $this->assertContains('list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0', $t);
+        $this->assertContains('start=65', $t);
 
         // Format: youtube playlist.
         $url = new moodle_url('http://www.youtube.com/view_play_list?p=PL6E18E2927047B662');
