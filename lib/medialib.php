@@ -536,13 +536,65 @@ class core_media_player_youtube extends core_media_player_external {
 
         self::pick_video_size($width, $height);
 
+        $params = self::get_start_time($url);
+
+        $listid = $url->param('list');
+        // Check for non-empty but valid playlist ID.
+        if (!empty($listid) && !preg_match('/([^a-zA-Z0-9\-_]+)/', $listid)) {
+            // This video is part of a playlist, and we want to embed it as such.
+            $params .= 'list=' . $url->param('list') . '&';
+        }
+
         return <<<OET
 <span class="mediaplugin mediaplugin_youtube">
 <iframe title="$info" width="$width" height="$height"
-  src="https://www.youtube.com/embed/$videoid?rel=0&wmode=transparent" frameborder="0" allowfullscreen="1"></iframe>
+  src="https://www.youtube.com/embed/$videoid?{$params}rel=0&wmode=transparent" frameborder="0" allowfullscreen="1"></iframe>
 </span>
 OET;
 
+    }
+
+    /**
+     * Check for start time parameter.  Note that it's in hours/mins/secs in the URL,
+     * but the embedded player takes only a number of seconds as the "start" parameter.
+     * @param moodle_url $url URL of video to be embedded.
+     * @return string Additional URL parameter if required (otherwise empty).
+     */
+    protected static function get_start_time($url) {
+        $matches = array();
+        $time = '';
+
+        $rawtime = $url->param('t');
+        if (empty($rawtime)) {
+            // No time specified.
+            return $time;
+        }
+
+        if (preg_match('/(\d+?h)?(\d+?m)?(\d+?s)?/i', $rawtime, $matches)) {
+            // Convert into a raw number of seconds, as that's all embedded players accept.
+            $seconds = 0;
+            for ($i = 1; $i < count($matches); $i++) {
+                if (empty($matches[$i])) {
+                    continue;
+                }
+                $part = str_split($matches[$i], strlen($matches[$i]) - 1);
+                switch ($part[1]) {
+                    case 'h':
+                        $seconds += 3600 * $part[0];
+                        break;
+                    case 'm':
+                        $seconds += 60 * $part[0];
+                        break;
+                    default:
+                        $seconds += $part[0];
+                }
+            }
+
+            // Embedded player param is "start" and takes a raw number of seconds.
+            $time = 'start=' . $seconds . '&';
+        }
+
+        return $time;
     }
 
     protected function get_regex() {
