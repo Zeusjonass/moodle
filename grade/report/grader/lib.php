@@ -1084,14 +1084,6 @@ class grade_report_grader extends grade_report {
                         $itemcell->attributes['class'] .= ' grade_type_text';
                     }
 
-                    // Only allow edting if the grade is editable (not locked, not in a unoverridable category, etc).
-                    if ($enableajax && $grade->is_editable()) {
-                        // If a grade item is type text, and we don't have show quick feedback on, it can't be edited.
-                        if ($item->gradetype != GRADE_TYPE_TEXT || $showquickfeedback) {
-                            $itemcell->attributes['class'] .= ' clickable';
-                        }
-                    }
-
                     if ($item->needsupdate) {
                         $itemcell->text .= "<span class='gradingerror{$hidden}{$gradepass}'>" . $error . "</span>";
                     } else {
@@ -1106,6 +1098,14 @@ class grade_report_grader extends grade_report {
                         if ($showanalysisicon) {
                             $itemcell->text .= $this->gtree->get_grade_analysis_icon($grade);
                         }
+                    }
+                }
+
+                // Only allow edting if the grade is editable (not locked, not in a unoverridable category, etc).
+                if ($enableajax && $grade->is_editable()) {
+                    // If a grade item is type text, and we don't have show quick feedback on, it can't be edited.
+                    if ($item->gradetype != GRADE_TYPE_TEXT || $showquickfeedback) {
+                        $itemcell->attributes['class'] .= ' clickable';
                     }
                 }
 
