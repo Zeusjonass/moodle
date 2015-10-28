@@ -328,8 +328,8 @@ M.gradereport_grader.classes.ajax.prototype.get_next_cell = function(cell) {
     if (!next) {
         return this.current.node;
     }
-    // Continue on until we find a clickable cell
-    if (!next.hasClass('clickable')) {
+    // Continue on until we find a navigable cell
+    if (!next.hasClass('gbnavigable')) {
         return this.get_next_cell(next);
     }
     return next;
@@ -352,8 +352,8 @@ M.gradereport_grader.classes.ajax.prototype.get_prev_cell = function(cell) {
     if (!next) {
         return this.current.node;
     }
-    // Continue on until we find a clickable cell
-    if (!next.hasClass('clickable')) {
+    // Continue on until we find a navigable cell
+    if (!next.hasClass('gbnavigable')) {
         return this.get_prev_cell(next);
     }
     return next;
@@ -380,8 +380,8 @@ M.gradereport_grader.classes.ajax.prototype.get_above_cell = function(cell) {
     if (!next) {
         return this.current.node;
     }
-    // Continue on until we find a clickable cell
-    if (!next.hasClass('clickable')) {
+    // Continue on until we find a navigable cell
+    if (!next.hasClass('gbnavigable')) {
         return this.get_above_cell(next);
     }
     return next;
@@ -408,8 +408,8 @@ M.gradereport_grader.classes.ajax.prototype.get_below_cell = function(cell) {
     if (!next) {
         return this.current.node;
     }
-    // Continue on until we find a clickable cell
-    if (!next.hasClass('clickable')) {
+    // Continue on until we find a navigable cell
+    if (!next.hasClass('gbnavigable')) {
         return this.get_below_cell(next);
     }
     return next;
@@ -706,7 +706,7 @@ M.gradereport_grader.classes.existingfield = function(ajax, userid, itemid) {
         // Handle the Enter key being pressed.
         this.keyevents.push(this.report.Y.on('key', this.keypress_enter, this.grade, 'press:13', this));
         // Handle CTRL + arrow keys.
-        this.keyevents.push(this.report.Y.on('key', this.keypress_arrows, this.grade, 'press:37,38,39,40+ctrl', this));
+        this.keyevents.push(this.report.Y.on('key', this.keypress_arrows, this.grade, 'down:37,38,39,40+ctrl', this));
     }
 };
 /**
@@ -785,6 +785,7 @@ M.gradereport_grader.classes.existingfield.prototype.keypress_arrows = function(
 M.gradereport_grader.classes.existingfield.prototype.move_focus = function(node) {
     if (node) {
         var properties = this.report.get_cell_info(node);
+        this.report.ajax.current = node;
         switch(properties.itemtype) {
             case 'scale':
                 properties.cell.one('select.select').focus();
