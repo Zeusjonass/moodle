@@ -2213,7 +2213,7 @@ function print_collapsible_region_start($classes, $id, $caption, $userpref = '',
     $output .= '<div id="' . $id . '_caption" class="collapsibleregioncaption">';
     $output .= $caption . ' ';
     $output .= '</div><div id="' . $id . '_inner" class="collapsibleregioninner">';
-    $PAGE->requires->js_init_call('M.util.init_collapsible_region', array($id, $userpref, get_string('clicktohideshow')));
+    $PAGE->requires->js_init_call('M.util.init_collapsible_region', array($id, $userpref, get_string('clicktohideshow')), true);
 
     if ($return) {
         return $output;
