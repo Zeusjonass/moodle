@@ -50,6 +50,7 @@ function grade_import_commit($courseid, $importcode, $importfeedback=true, $verb
     $executionerrors = false;
     $commitstart = time(); // start time in case we need to roll back
     $newitemids = array(); // array to hold new grade_item ids from grade_import_newitem table, mapping array
+    $overmax = array(); // Array of grades which were over the item's maximum.
 
     /// first select distinct new grade_items with this batch
     $params = array($importcode, $USER->id);
@@ -76,6 +77,14 @@ function grade_import_commit($courseid, $importcode, $importfeedback=true, $verb
                     if (!$gradeitem->update_final_grade($grade->userid, $grade->finalgrade, 'import', $grade->feedback, FORMAT_MOODLE)) {
                         $failed = true;
                         break 2;
+                    }
+                    if (!empty($grade->finalgrade) && ($grade->finalgrade != $gradeitem->bounded_grade($grade->finalgrade))) {
+                        $info = new stdClass();
+                        $info->user = $grade->userid;
+                        $info->imported = $grade->finalgrade;
+                        $info->final = $gradeitem->bounded_grade($grade->finalgrade);
+                        $info->item = $gradeitem->itemname;
+                        $overmax[] = $info;
                     }
                 }
             }
@@ -127,6 +136,14 @@ function grade_import_commit($courseid, $importcode, $importfeedback=true, $verb
                         $failed = true;
                         break 2;
                     }
+                    if (!empty($grade->finalgrade) && ($grade->finalgrade != $gradeitem->bounded_grade($grade->finalgrade))) {
+                        $info = new stdClass();
+                        $info->user = $grade->userid;
+                        $info->imported = $grade->finalgrade;
+                        $info->final = $gradeitem->bounded_grade($grade->finalgrade);
+                        $info->item = $gradeitem->itemname;
+                        $overmax[] = $info;
+                    }
                 }
                 //$itemdetails -> idnumber = $gradeitem->idnumber;
                 $modifieditems[] = $itemid;
@@ -146,6 +163,20 @@ function grade_import_commit($courseid, $importcode, $importfeedback=true, $verb
         }
     }
 
+    if (!empty($overmax)) {
+        // Over max - should be notified whether or not we're being verbose, as they're deviations from imported data.
+        $list = array();
+        $ufields = get_all_user_name_fields(true);
+        $namesql = "SELECT id, $ufields FROM {user} WHERE id = :userid";
+
+        foreach ($overmax as $info) {
+            $u = $DB->get_record_sql($namesql, array('userid' => $info->user));
+            $info->name = fullname($u);
+            $info->imported = format_float($info->imported, 5, true, true); // Last "true" cleans up trailing zeros.
+            $list[] = get_string('importedgradeadjusted', 'grades', $info);
+        }
+        echo $OUTPUT->notification(get_string('importedgradesadjusted', 'grades', html_writer::alist($list)), 'notifymessage');
+    }
     if ($verbose) {
         echo $OUTPUT->notification(get_string('importsuccess', 'grades'), 'notifysuccess');
         $unenrolledusers = get_unenrolled_users_in_import($importcode, $courseid);
